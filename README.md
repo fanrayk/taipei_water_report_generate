@@ -20,11 +20,11 @@
 1. 開啟命令提示字元（Command Prompt）或 PowerShell。
 2. 在專案根目錄下執行：
     ```bash
-    python -m venv venv
+    python -m venv .venv
     ```
 3. 啟動虛擬環境：
     ```bash
-    venv\Scripts\activate
+    .venv\Scripts\activate
     ```
 
 ### macOS / Linux
