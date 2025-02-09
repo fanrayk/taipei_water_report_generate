@@ -8,7 +8,7 @@ from docx.enum.table import WD_ROW_HEIGHT_RULE, WD_CELL_VERTICAL_ALIGNMENT
 from docx2pdf import convert  # 轉換成 PDF 用
 
 # 讀取模板文件（請將此檔案名稱修改為你的模板檔案）
-doc = DocxTemplate("附件1_定位資料回饋表_管道模板.docx")
+doc = DocxTemplate("template/附件1模板/附件1_定位資料回饋表_管道模板.docx")
 
 # ------------------------------
 # 生成 100 筆模擬資料
