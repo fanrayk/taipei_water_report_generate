@@ -15,6 +15,7 @@ from docx.shared import Pt, Cm
 from docx.enum.table import WD_ROW_HEIGHT_RULE, WD_CELL_VERTICAL_ALIGNMENT
 from docx2pdf import convert
 from PyPDF2 import PdfMerger
+import glob
 
 
 # -----------------------------------
@@ -330,9 +331,9 @@ context = {
 }
 doc.render(context)
 word_filename = os.path.join(output_folder, "管線.docx")
-doc.save(word_filename)
+# doc.save(word_filename)
 pdf_filename = os.path.join(output_folder, "管線.pdf")
-convert(word_filename, pdf_filename)
+# convert(word_filename, pdf_filename)
 print("管線 PDF 已產生：", pdf_filename)
 
 # ============================================
@@ -532,12 +533,12 @@ def photo_grouping():
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
 
-    merged_docx_filename = os.path.join(output_folder, "測量照.docx")
+    merged_docx_filename = os.path.join(output_folder, "附件2.docx")
     merged_doc.save(merged_docx_filename)
     print(f"已儲存合併後的 Docx 檔案: {merged_docx_filename}")
 
     # 利用 docx2pdf 將合併後的 docx 轉換成 PDF
-    merged_pdf_filename = os.path.join(output_folder, "測量照.pdf")
+    merged_pdf_filename = os.path.join(output_folder, "附件2.pdf")
     convert(merged_docx_filename, merged_pdf_filename)
     print(f"已儲存合併後的 PDF 檔案: {merged_pdf_filename}")
 
@@ -625,12 +626,12 @@ def photo_grouping_app():
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
 
-    merged_docx_filename = os.path.join(output_folder, "讀數照.docx")
+    merged_docx_filename = os.path.join(output_folder, "附件3.docx")
     merged_doc.save(merged_docx_filename)
     print(f"【讀數照】已儲存合併後的 Docx 檔案: {merged_docx_filename}")
 
     # 利用 docx2pdf 將合併後的 docx 轉換成 PDF
-    merged_pdf_filename = os.path.join(output_folder, "讀數照.pdf")
+    merged_pdf_filename = os.path.join(output_folder, "附件3.pdf")
     convert(merged_docx_filename, merged_pdf_filename)
     print(f"【讀數照】已儲存合併後的 PDF 檔案: {merged_pdf_filename}")
 
@@ -877,6 +878,16 @@ if __name__ == "__main__":
     data_docx = generate_data_doc(max_rows_per_page=10)
     if image_docx and data_docx:
         final_docx = merge_docs(image_docx, data_docx)
-        final_pdf = os.path.join(output_folder, "平面圖_final.pdf")
+        final_pdf = os.path.join(output_folder, "附件4.pdf")
         convert(final_docx, final_pdf)
         print(f"【平面圖】最終 PDF 已儲存: {final_pdf}")
+    
+    temp_file_pattern = os.path.join(output_folder, "temp*")
+    temp_files = glob.glob(temp_file_pattern)
+    for temp_file in temp_files:
+        try:
+            os.remove(temp_file)
+            print(f"已刪除暫存檔案: {temp_file}")
+        except Exception as e:
+            print(f"刪除暫存檔案 {temp_file} 時發生錯誤: {e}")
+    print("========== 全部流程完成 ==========")
