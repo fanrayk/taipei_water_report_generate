@@ -16,6 +16,27 @@
 
 3. **照片處理**：
    - 自動分組處理「測量照」與「讀數照」，並生成對應的 Word 與 PDF 文件。
+   - 使用者需自行加入照片資料夾，結構如下：
+     ```
+     TEMPLATE/
+     ├── 附件1模板/
+     ├── 附件2模板/
+     ├── 附件3模板/
+     ├── 附件4模板/
+     ├── 照片/
+         ├── 西區/
+             ├── 監工/
+                 ├── a/
+                     ├──1.jpg 
+                     ├──2.jpg
+                 ├── b/
+                 ├── ...
+         ├── 營業處/
+             ├── 1.jpg
+             ├── 2.jpg
+             ├── 3.jpg
+             ├── 4.jpg
+     ```
 
 4. **平面圖文件生成**：
    - 產生包含圖片的平面圖文件。
@@ -24,6 +45,23 @@
 
 5. **清理暫存檔案**：
    - 刪除處理過程中的臨時文件，保持資料夾整潔。
+
+## 使用方式
+### Windows
+```sh
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
+
+### Linux/macOS
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
 
 ## 主要檔案與功能
 | 檔案名稱 | 主要功能 |
@@ -35,49 +73,9 @@
 | `utils.py` | 包含輔助函數，如文件格式調整、資料拆分、清理暫存文件等。 |
 | `requirements.txt` | 專案所需 Python 套件清單。 |
 
-## 依賴套件
-專案所需的 Python 套件如下（可透過 `pip install -r requirements.txt` 安裝）：
-- `docxtpl` - 模板式 Word 文件生成。
-- `python-docx` - 讀寫 Word 文件。
-- `docx2pdf` - Word 轉 PDF。
-- `PyPDF2` - PDF 合併與處理。
-- `pandas` - Excel 數據處理。
-- `openpyxl` - 讀取與寫入 Excel 檔案。
-
-## 使用方式
-### 1. 安裝環境與套件
-確保已安裝 Python（建議 3.6 以上版本），並執行以下指令安裝所需套件：
-```sh
-python -m venv .venv
-source .venv/bin/activate  # macOS/Linux
-.venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-```
-
-### 2. 執行主程式
-在終端機或命令提示字元中執行：
-```sh
-python main.py
-```
-系統會要求選擇包含 Excel 檔案的資料夾。
-
-### 3. Excel 資料處理
-- 程式將讀取選擇的 Excel 檔案並解析管道測量數據。
-- 根據數據類型（模擬或保留）進行分類與處理。
-
-### 4. 生成報告與圖片處理
-- 程式會自動產生 Word 文件，並轉換為 PDF 報告。
-- 若有相關照片，將進行分類與嵌入 Word 文件。
-
-### 5. 輸出結果
-- 最終報告將存放於 `output/{案號}/` 目錄下。
-- 產生的主要輸出文件包括：
-  - `附件1-證明資料.pdf`
-  - `附件2-測量照片.pdf`
-  - `附件3-記錄器資料.pdf`
-  - `附件4-測量結果.pdf`
-
-## 注意事項
-- 確保 Excel 資料夾內 **僅有一個 Excel 檔案**，否則程式會終止。
-- 若有使用 Windows 轉換 PDF，須確保電腦安裝 Microsoft Word。
-- 產生的報告存放於 `output/{案號}/` 目錄下。
+## 輸出結果
+- **附件1-證明資料.pdf**：包含 Excel 資料解析後的完整報告。
+- **附件2-測量照片.pdf**：處理後的測量照。
+- **附件3-記錄器資料.pdf**：讀數照的整理報告。
+- **附件4-測量結果.pdf**：包含所有平面圖與數據的最終報告。
+- **所有 Word 文件** 也會存放在 `output/{案號}/` 目錄中，以便後續修改。
