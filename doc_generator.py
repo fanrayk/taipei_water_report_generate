@@ -224,6 +224,7 @@ def generate_image_doc(folder_path, context_number, output_folder):
         for i in range(2):
             cell = img_table.cell(i, 0)
             paragraph = cell.paragraphs[0]
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             if i < len(group):
                 run = paragraph.add_run()
                 run.add_picture(group[i], width=Cm(12), height=Cm(10))
