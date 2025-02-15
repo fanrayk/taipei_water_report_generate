@@ -1,5 +1,6 @@
 # doc_generator.py
 import os
+import random
 from docxtpl import DocxTemplate, InlineImage
 from docx import Document
 from docx.oxml import OxmlElement
@@ -12,11 +13,60 @@ from PyPDF2 import PdfMerger
 from utils import set_cell_width, chunk_list
 
 
-def generate_records_doc(record, context_number, output_folder):
+def generate_records_doc(record, output_folder):
     template_path = os.path.join(
         "template", "附件1模板", "附件1_自主查核表_首頁模板.docx"
     )
     doc = DocxTemplate(template_path)
+
+    # 根據 record["district"] 與 record["supervisor_name"] 找到對應資料夾
+    supervisor_folder_path = os.path.join(
+        os.getcwd(),
+        "template",
+        "照片",
+        record.get("district"),  # e.g. "西區"
+        "監工",
+        record.get("supervisor_name"),  # e.g. "朱彥顯"
+    )
+
+    # 取得資料夾內所有 .jpg 檔案
+    supervisor_image_files = [
+        f for f in os.listdir(supervisor_folder_path) if f.lower().endswith(".jpg")
+    ]
+
+    # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
+    if not supervisor_image_files:
+        print("此資料夾沒有任何 JPG 檔案:", supervisor_folder_path)
+        return None, None
+
+    # 從最後兩個檔案中隨機選一個
+    supervisor_name_jpg = random.choice(supervisor_image_files)
+
+    # 組合成完整路徑
+    supervisor_name_jpg_path = os.path.join(supervisor_folder_path, supervisor_name_jpg)
+
+    district_folder_path = os.path.join(
+        os.getcwd(), "template", "照片", record.get("district"), "營業處"  # e.g. "西區"
+    )
+
+    # 取得資料夾內所有 .jpg 檔案
+    district_image_files = [
+        f for f in os.listdir(district_folder_path) if f.lower().endswith(".jpg")
+    ]
+
+    # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
+    if not district_image_files:
+        print("此資料夾沒有任何 JPG 檔案:", district_folder_path)
+        return None, None
+
+    # 從最後兩個檔案中隨機選一個
+    random_jpg = random.choice(district_image_files)
+
+    # 組合成完整路徑
+    district_path = os.path.join(district_folder_path, random_jpg)
+    # 插入到模板中，假設模板裡有 {{ supervisor_name_pic }} 的占位符
+    record["supervisor_name_pic"] = InlineImage(doc, supervisor_name_jpg_path, width=Cm(6))
+    record["district_pic"] = InlineImage(doc, district_path, width=Cm(6))
     doc.render(record)
     # 在檔名前加上 context_number
     docx_filename = os.path.join(output_folder, "temp_自主查核表首頁.docx")
@@ -24,7 +74,7 @@ def generate_records_doc(record, context_number, output_folder):
     pdf_path = os.path.join(output_folder, "temp_自主查核表首頁.pdf")
     convert(docx_filename, pdf_path)
     print("Records PDF 已產生：", pdf_path)
-    return docx_filename,pdf_path
+    return docx_filename, pdf_path
 
 
 def generate_pipeline_doc(simulated_data, context_number, output_folder):
@@ -95,7 +145,7 @@ def generate_pipeline_doc(simulated_data, context_number, output_folder):
     pdf_filename = os.path.join(output_folder, "temp_管線.pdf")
     convert(word_filename, pdf_filename)
     print("管線 PDF 已產生：", pdf_filename)
-    return word_filename,pdf_filename
+    return word_filename, pdf_filename
 
 
 def generate_reserved_doc(reserved_data, context_number, output_folder):
@@ -174,7 +224,7 @@ def generate_reserved_doc(reserved_data, context_number, output_folder):
     pdf_filename = os.path.join(output_folder, "設施物.pdf")
     convert(docx_filename, pdf_filename)
     print("設施物 PDF 已產生：", pdf_filename)
-    return docx_filename,pdf_filename
+    return docx_filename, pdf_filename
 
 
 def merge_pdf_files(pdf_files, merged_pdf_filename):
@@ -335,7 +385,7 @@ def generate_data_doc(
     return data_docx_path
 
 
-def merge_docs(doc_paths, output_folder,filename):
+def merge_docs(doc_paths, output_folder, filename):
     # 以第一個文件作為基礎
     merged_doc = Document(doc_paths[0])
     # 從第二個開始依序加入，每個檔案前加入分頁符
@@ -348,4 +398,3 @@ def merge_docs(doc_paths, output_folder,filename):
     merged_doc.save(final_docx)
     print("【平面圖】最終合併檔案已儲存:", final_docx)
     return final_docx
-
