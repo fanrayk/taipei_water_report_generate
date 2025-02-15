@@ -4,3 +4,4 @@ generated_doc.*
 output
 產報告用
 *.zip
+__pycache__
