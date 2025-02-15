@@ -11,19 +11,26 @@ from docx2pdf import convert
 from PyPDF2 import PdfMerger
 from utils import set_cell_width, chunk_list
 
-def generate_records_doc(record, output_folder):
-    template_path = os.path.join("template", "附件1模板", "附件1_自主查核表_首頁模板.docx")
+
+def generate_records_doc(record, context_number, output_folder):
+    template_path = os.path.join(
+        "template", "附件1模板", "附件1_自主查核表_首頁模板.docx"
+    )
     doc = DocxTemplate(template_path)
     doc.render(record)
-    docx_filename = os.path.join(output_folder, "自主查核表首頁.docx")
+    # 在檔名前加上 context_number
+    docx_filename = os.path.join(output_folder, f"{context_number}_自主查核表首頁.docx")
     doc.save(docx_filename)
-    pdf_path = os.path.join(output_folder, "自主查核表首頁.pdf")
+    pdf_path = os.path.join(output_folder, f"{context_number}_自主查核表首頁.pdf")
     convert(docx_filename, pdf_path)
     print("Records PDF 已產生：", pdf_path)
     return pdf_path
 
+
 def generate_pipeline_doc(simulated_data, context_number, output_folder):
-    template_path = os.path.join("template", "附件1模板", "附件1_定位資料回饋表_管道模板.docx")
+    template_path = os.path.join(
+        "template", "附件1模板", "附件1_定位資料回饋表_管道模板.docx"
+    )
     doc = DocxTemplate(template_path)
     subdoc = doc.new_subdoc()
     num_cols = 7
@@ -90,13 +97,24 @@ def generate_pipeline_doc(simulated_data, context_number, output_folder):
     print("管線 PDF 已產生：", pdf_filename)
     return pdf_filename
 
+
 def generate_reserved_doc(reserved_data, context_number, output_folder):
-    template_path = os.path.join("template", "附件1模板", "附件1_定位資料回饋表_設施物模板.docx")
+    template_path = os.path.join(
+        "template", "附件1模板", "附件1_定位資料回饋表_設施物模板.docx"
+    )
     doc = DocxTemplate(template_path)
     subdoc = doc.new_subdoc()
     num_cols = 7
     table = subdoc.add_table(rows=1, cols=num_cols)
-    reserved_headers = ["編號", "種類", "座標X", "座標Y", "地盤高程", "埋管深度", "管頂座標z"]
+    reserved_headers = [
+        "編號",
+        "種類",
+        "座標X",
+        "座標Y",
+        "地盤高程",
+        "埋管深度",
+        "管頂座標z",
+    ]
     for i, cell in enumerate(table.rows[0].cells):
         paragraph = cell.paragraphs[0]
         paragraph.paragraph_format.left_indent = 0
@@ -158,6 +176,7 @@ def generate_reserved_doc(reserved_data, context_number, output_folder):
     print("設施物 PDF 已產生：", pdf_filename)
     return pdf_filename
 
+
 def merge_pdf_files(pdf_files, merged_pdf_filename):
     merger = PdfMerger()
     for pdf in pdf_files:
@@ -165,6 +184,7 @@ def merge_pdf_files(pdf_files, merged_pdf_filename):
     merger.write(merged_pdf_filename)
     merger.close()
     print("PDF 合併完成，最終 PDF 檔案：", merged_pdf_filename)
+
 
 def generate_image_doc(folder_path, context_number, output_folder):
     template_path = os.path.join("template", "附件4模板", "附件4模板.docx")
@@ -182,14 +202,16 @@ def generate_image_doc(folder_path, context_number, output_folder):
     if not image_files:
         print("在『平面圖』資料夾中找不到符合的照片。")
         return None
+
     def extract_number(filename):
         base = os.path.basename(filename)
         try:
             return int(os.path.splitext(base)[0])
         except:
             return 0
+
     image_files.sort(key=extract_number)
-    image_groups = [image_files[i:i+2] for i in range(0, len(image_files), 2)]
+    image_groups = [image_files[i : i + 2] for i in range(0, len(image_files), 2)]
     print(f"【平面圖】共找到 {len(image_files)} 張照片，分成 {len(image_groups)} 組。")
     if not os.path.exists(template_path):
         print(f"找不到模板檔案：{template_path}")
@@ -198,9 +220,9 @@ def generate_image_doc(folder_path, context_number, output_folder):
     for idx, group in enumerate(image_groups, start=1):
         doc = DocxTemplate(template_path)
         subdoc = doc.new_subdoc()
-        img_table = subdoc.add_table(rows=1, cols=2)
+        img_table = subdoc.add_table(rows=2, cols=1)
         for i in range(2):
-            cell = img_table.cell(0, i)
+            cell = img_table.cell(i, 0)
             paragraph = cell.paragraphs[0]
             if i < len(group):
                 run = paragraph.add_run()
@@ -223,20 +245,33 @@ def generate_image_doc(folder_path, context_number, output_folder):
     print("【平面圖 - 圖片部分】已儲存:", image_docx_path)
     return image_docx_path
 
-def generate_data_doc(simulated_data, reserved_data, context_number, output_folder, max_rows_per_page=10):
+
+def generate_data_doc(
+    simulated_data, reserved_data, context_number, output_folder, max_rows_per_page=10
+):
     template_path = os.path.join("template", "附件4模板", "附件4模板.docx")
     if not os.path.exists(template_path):
         print(f"找不到模板檔案：{template_path}")
         return None
     combined_data = simulated_data + reserved_data
     data_chunks = chunk_list(combined_data, max_rows_per_page)
-    print(f"【平面圖 - 資料部分】共分成 {len(data_chunks)} 個資料區塊（每頁最多 {max_rows_per_page} 行）。")
+    print(
+        f"【平面圖 - 資料部分】共分成 {len(data_chunks)} 個資料區塊（每頁最多 {max_rows_per_page} 行）。"
+    )
     temp_pages = []
     for idx, chunk in enumerate(data_chunks, start=1):
         doc = DocxTemplate(template_path)
         subdoc = doc.new_subdoc()
         table = subdoc.add_table(rows=1, cols=7)
-        headers = ["編號", "種類", "座標X", "座標Y", "地盤高程", "埋管深度", "管頂座標z"]
+        headers = [
+            "編號",
+            "種類",
+            "座標X",
+            "座標Y",
+            "地盤高程",
+            "埋管深度",
+            "管頂座標z",
+        ]
         for j, cell in enumerate(table.rows[0].cells):
             paragraph = cell.paragraphs[0]
             paragraph.paragraph_format.left_indent = 0
@@ -269,6 +304,15 @@ def generate_data_doc(simulated_data, reserved_data, context_number, output_fold
             tblPr.append(tblW)
         tblW.set(qn("w:w"), "10000")
         tblW.set(qn("w:type"), "dxa")
+        tbl_borders = OxmlElement("w:tblBorders")
+        for border_name in ["top", "left", "bottom", "right", "insideH", "insideV"]:
+            border = OxmlElement("w:" + border_name)
+            border.set(qn("w:val"), "single")
+            border.set(qn("w:sz"), "8")
+            border.set(qn("w:space"), "0")
+            border.set(qn("w:color"), "000000")
+            tbl_borders.append(border)
+        tblPr.append(tbl_borders)
         column_widths = [658, 1756, 1316, 1429, 1094, 1094, 1208]
         for row in table.rows:
             for idx2, cell in enumerate(row.cells):
@@ -288,6 +332,7 @@ def generate_data_doc(simulated_data, reserved_data, context_number, output_fold
     merged_doc.save(data_docx_path)
     print("【平面圖 - 資料部分】已儲存:", data_docx_path)
     return data_docx_path
+
 
 def merge_docs(doc1_path, doc2_path, output_folder):
     merged_doc = Document(doc1_path)

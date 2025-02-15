@@ -53,11 +53,11 @@ def photo_grouping_measured(folder_path, context_number, output_folder):
         temp_doc = Document(temp_file)
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
-    merged_docx_filename = os.path.join(output_folder, "附件2.docx")
+    merged_docx_filename = os.path.join(output_folder, f"{context_number}-附件2-測量照片.docx")
     merged_doc.save(merged_docx_filename)
     print(f"已儲存合併後的 Docx 檔案: {merged_docx_filename}")
     from docx2pdf import convert
-    pdf_path = os.path.join(output_folder, "附件2.pdf")
+    pdf_path = os.path.join(output_folder, f"{context_number}-附件2-測量照片.pdf")
     convert(merged_docx_filename, pdf_path)
     print(f"已儲存合併後的 PDF 檔案: {pdf_path}")
 
@@ -96,7 +96,7 @@ def photo_grouping_app(folder_path, context_number, output_folder):
             point_key = f"point_{i+1}"
             if i < len(group):
                 context[photo_key] = InlineImage(doc, group[i], width=Cm(8.09), height=Cm(5.38))
-                context[point_key] = f"編號：app_pt{i+1}"
+                context[point_key] = f"編號：pt{i+1}"
             else:
                 context[photo_key] = ""
                 context[point_key] = ""
@@ -110,9 +110,9 @@ def photo_grouping_app(folder_path, context_number, output_folder):
         temp_doc = Document(temp_file)
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
-    merged_docx_filename = os.path.join(output_folder, "附件3.docx")
+    merged_docx_filename = os.path.join(output_folder, f"{context_number}-附件3-記錄器資料.docx")
     merged_doc.save(merged_docx_filename)
     from docx2pdf import convert
-    pdf_path = os.path.join(output_folder, "附件3.pdf")
+    pdf_path = os.path.join(output_folder, f"{context_number}-附件3-記錄器資料.pdf")
     convert(merged_docx_filename, pdf_path)
     print(f"【讀數照】已儲存合併後的 PDF 檔案: {pdf_path}")
