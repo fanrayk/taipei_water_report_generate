@@ -19,12 +19,12 @@ def generate_records_doc(record, context_number, output_folder):
     doc = DocxTemplate(template_path)
     doc.render(record)
     # 在檔名前加上 context_number
-    docx_filename = os.path.join(output_folder, f"{context_number}_自主查核表首頁.docx")
+    docx_filename = os.path.join(output_folder, "temp_自主查核表首頁.docx")
     doc.save(docx_filename)
-    pdf_path = os.path.join(output_folder, f"{context_number}_自主查核表首頁.pdf")
+    pdf_path = os.path.join(output_folder, "temp_自主查核表首頁.pdf")
     convert(docx_filename, pdf_path)
     print("Records PDF 已產生：", pdf_path)
-    return pdf_path
+    return docx_filename,pdf_path
 
 
 def generate_pipeline_doc(simulated_data, context_number, output_folder):
@@ -90,12 +90,12 @@ def generate_pipeline_doc(simulated_data, context_number, output_folder):
     tblPr.append(tbl_borders)
     context = {"table": subdoc, "case_number": context_number}
     doc.render(context)
-    word_filename = os.path.join(output_folder, "管線.docx")
+    word_filename = os.path.join(output_folder, "temp_管線.docx")
     doc.save(word_filename)
-    pdf_filename = os.path.join(output_folder, "管線.pdf")
+    pdf_filename = os.path.join(output_folder, "temp_管線.pdf")
     convert(word_filename, pdf_filename)
     print("管線 PDF 已產生：", pdf_filename)
-    return pdf_filename
+    return word_filename,pdf_filename
 
 
 def generate_reserved_doc(reserved_data, context_number, output_folder):
@@ -174,7 +174,7 @@ def generate_reserved_doc(reserved_data, context_number, output_folder):
     pdf_filename = os.path.join(output_folder, "設施物.pdf")
     convert(docx_filename, pdf_filename)
     print("設施物 PDF 已產生：", pdf_filename)
-    return pdf_filename
+    return docx_filename,pdf_filename
 
 
 def merge_pdf_files(pdf_files, merged_pdf_filename):
@@ -240,7 +240,7 @@ def generate_image_doc(folder_path, context_number, output_folder):
         temp_doc = Document(temp_file)
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
-    image_docx_path = os.path.join(output_folder, "平面圖_圖片.docx")
+    image_docx_path = os.path.join(output_folder, "temp_平面圖_圖片.docx")
     merged_doc.save(image_docx_path)
     print("【平面圖 - 圖片部分】已儲存:", image_docx_path)
     return image_docx_path
@@ -328,19 +328,23 @@ def generate_data_doc(
         temp_doc = Document(temp_file)
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
-    data_docx_path = os.path.join(output_folder, "平面圖_資料.docx")
+    data_docx_path = os.path.join(output_folder, "temp_平面圖_資料.docx")
     merged_doc.save(data_docx_path)
     print("【平面圖 - 資料部分】已儲存:", data_docx_path)
     return data_docx_path
 
 
-def merge_docs(doc1_path, doc2_path, output_folder):
-    merged_doc = Document(doc1_path)
-    merged_doc.add_page_break()
-    temp_doc = Document(doc2_path)
-    for element in temp_doc.element.body:
-        merged_doc.element.body.append(element)
-    final_docx = os.path.join(output_folder, "平面圖_final.docx")
+def merge_docs(doc_paths, output_folder,filename):
+    # 以第一個文件作為基礎
+    merged_doc = Document(doc_paths[0])
+    # 從第二個開始依序加入，每個檔案前加入分頁符
+    for doc_path in doc_paths[1:]:
+        merged_doc.add_page_break()
+        temp_doc = Document(doc_path)
+        for element in temp_doc.element.body:
+            merged_doc.element.body.append(element)
+    final_docx = os.path.join(output_folder, filename)
     merged_doc.save(final_docx)
     print("【平面圖】最終合併檔案已儲存:", final_docx)
     return final_docx
+

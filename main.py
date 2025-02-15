@@ -43,19 +43,28 @@ def main():
     # 5. 產生首頁文件
     records_list = df_renamed.to_dict(orient="records")
     record = records_list[0] if records_list else {}
-    records_pdf = generate_records_doc(record, context_number, output_folder)
+    records_doc, records_pdf = generate_records_doc(
+        record, context_number, output_folder
+    )
 
     # 6. 產生管線文件及（如有）設施物文件
-    pipeline_pdf = generate_pipeline_doc(simulated_data, context_number, output_folder)
+    pipeline_doc, pipeline_pdf = generate_pipeline_doc(
+        simulated_data, context_number, output_folder
+    )
     pdf_list = [records_pdf, pipeline_pdf]
     if reserved_data:
-        reserved_pdf = generate_reserved_doc(
+        reserved_doc, reserved_pdf = generate_reserved_doc(
             reserved_data, context_number, output_folder
         )
         pdf_list.append(reserved_pdf)
     merged_pdf_filename = os.path.join(
         output_folder, f"{context_number}-附件1-證明資料.pdf"
     )
+    if reserved_data:
+        merge_docs([records_doc, reserved_doc, pipeline_doc], output_folder,f"{context_number}-附件1-證明資料.docx")
+    else:
+        merge_docs([records_doc, pipeline_doc], output_folder,f"{context_number}-附件1-證明資料.docx")
+
     merge_pdf_files(pdf_list, merged_pdf_filename)
 
     # 7. 照片分組處理
@@ -76,13 +85,13 @@ def main():
         max_rows_per_page=10,
     )
     if image_docx and data_docx:
-        final_docx = merge_docs(image_docx, data_docx, output_folder)
+        final_docx = merge_docs([image_docx, data_docx], output_folder,f"{context_number}-附件4-測量結果.docx")
         final_pdf = os.path.join(output_folder, f"{context_number}-附件4-測量結果.pdf")
         convert(final_docx, final_pdf)
         print("【平面圖】最終 PDF 已儲存:", final_pdf)
 
     # 9. 刪除暫存檔案
-    cleanup_temp_files(output_folder)
+    cleanup_temp_files(output_folder, "temp*")
 
     print("========== 全部流程完成 ==========")
 
