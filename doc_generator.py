@@ -164,7 +164,7 @@ def generate_reserved_doc(reserved_data, context_number, output_folder):
         "座標X",
         "座標Y",
         "地盤高程",
-        "管頂座標z",
+        "座標z",
     ]
     for i, cell in enumerate(table.rows[0].cells):
         paragraph = cell.paragraphs[0]
@@ -275,8 +275,8 @@ def generate_image_doc(folder_path, context_number, output_folder):
         img_table = subdoc.add_table(rows=2, cols=1)
         
         # 直接設定表格寬度到最大（9020 dxa，大約 15.92 公分）
-        from docx.oxml import OxmlElement
-        from docx.oxml.ns import qn
+        # from docx.oxml import OxmlElement
+        # from docx.oxml.ns import qn
         tbl = img_table._element
         tblPr = tbl.find(qn("w:tblPr"))
         if tblPr is None:
@@ -370,7 +370,7 @@ def generate_data_doc(
         "座標X",
         "座標Y",
         "地盤高程",
-        "管頂座標z",
+        "座標z",
         "",
     ]
     # 在 simulated_data 資料列後插入另一個 header 行 (reserved_data 的 header)
