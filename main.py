@@ -14,6 +14,7 @@ from doc_generator import (
     generate_image_doc,
     generate_data_doc,
     merge_docs,
+    merge_pdfs
 )
 from photo_processor import photo_grouping_measured, photo_grouping_app
 from utils import cleanup_temp_files
@@ -79,25 +80,25 @@ def main():
     print("========== 『讀數照』照片分組處理 ==========")
     photo_grouping_app(folder_path, context_number, output_folder)
 
-    # 8. 平面圖文件產生（圖片部分與資料部分）
     print("========== 現在開始產生平面圖 - 圖片部分 ==========")
     image_docx = generate_image_doc(folder_path, context_number, output_folder)
+    image_pdf = os.path.join(output_folder, f"temp_{context_number}-圖片部分.pdf")
+    convert(image_docx, image_pdf)
+
     print("========== 現在開始產生平面圖 - 資料部分 ==========")
     data_docx = generate_data_doc(
         simulated_data,
         reserved_data,
         context_number,
         output_folder,
-        max_rows_per_page=10,
+        max_rows_per_page=50,
     )
-    if image_docx and data_docx:
-        final_docx = merge_docs(
-            [image_docx, data_docx],
-            output_folder,
-            f"{context_number}-附件4-測量結果.docx",
-        )
+    data_pdf = os.path.join(output_folder, f"temp_{context_number}-資料部分.pdf")
+    convert(data_docx, data_pdf)
+
+    if image_pdf and data_pdf:
         final_pdf = os.path.join(output_folder, f"{context_number}-附件4-測量結果.pdf")
-        convert(final_docx, final_pdf)
+        merge_pdfs([image_pdf, data_pdf], final_pdf)
         print("【平面圖】最終 PDF 已儲存:", final_pdf)
 
     # 9. 刪除暫存檔案

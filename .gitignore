@@ -2,7 +2,7 @@
 .venv
 generated_doc.*
 output
-產報告用
+*產報告
 *.zip
 __pycache__
 template/照片

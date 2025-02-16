@@ -1,5 +1,6 @@
 # excel_processor.py
 import os
+import datetime
 import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
@@ -65,9 +66,13 @@ def process_excel_pandas(excel_file_path):
     df_renamed["measurement_date"] = df_renamed["measurement_date"].apply(
         lambda x: {"year": x.year, "month": x.month, "day": x.day} if pd.notnull(x) else None
     )
+    current_date = datetime.datetime.now()
+    df_renamed["current_year"]= current_date.year
+    df_renamed["current_month"]= current_date.month
+    df_renamed["current_day"]= current_date.day
+
     df_renamed["measurement_method"] = df_renamed["measurement_method"].apply(transform_measurement_method)
     df_renamed["survey_equipment"] = df_renamed["survey_equipment"].apply(transform_measurement_method)
-    df_renamed["underline_22"] = "______________________"
     df_renamed = df_renamed.fillna("empty")
     return df_renamed
 
