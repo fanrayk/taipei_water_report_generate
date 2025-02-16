@@ -5,3 +5,4 @@ output
 *.zip
 __pycache__
 template/照片
+example

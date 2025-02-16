@@ -19,51 +19,51 @@ def generate_records_doc(record, output_folder):
     )
     doc = DocxTemplate(template_path)
 
-    # 根據 record["district"] 與 record["supervisor_name"] 找到對應資料夾
-    supervisor_folder_path = os.path.join(
-        os.getcwd(),
-        "template",
-        "照片",
-        record.get("district"),  # e.g. "西區"
-        "監工",
-        record.get("supervisor_name"),  # e.g. "朱彥顯"
-    )
+    # # 根據 record["district"] 與 record["supervisor_name"] 找到對應資料夾
+    # supervisor_folder_path = os.path.join(
+    #     os.getcwd(),
+    #     "template",
+    #     "照片",
+    #     record.get("district"),  # e.g. "西區"
+    #     "監工",
+    #     record.get("supervisor_name"),  # e.g. "朱彥顯"
+    # )
 
-    # 取得資料夾內所有 .jpg 檔案
-    supervisor_image_files = [
-        f for f in os.listdir(supervisor_folder_path) if f.lower().endswith(".jpg")
-    ]
+    # # 取得資料夾內所有 .jpg 檔案
+    # supervisor_image_files = [
+    #     f for f in os.listdir(supervisor_folder_path) if f.lower().endswith(".jpg")
+    # ]
 
-    # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
-    if not supervisor_image_files:
-        print("此資料夾沒有任何 JPG 檔案:", supervisor_folder_path)
-        return None, None
+    # # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
+    # if not supervisor_image_files:
+    #     print("此資料夾沒有任何 JPG 檔案:", supervisor_folder_path)
+    #     return None, None
 
-    # 從最後兩個檔案中隨機選一個
-    supervisor_name_jpg = random.choice(supervisor_image_files)
+    # # 從最後兩個檔案中隨機選一個
+    # supervisor_name_jpg = random.choice(supervisor_image_files)
 
-    # 組合成完整路徑
-    supervisor_name_jpg_path = os.path.join(supervisor_folder_path, supervisor_name_jpg)
+    # # 組合成完整路徑
+    # supervisor_name_jpg_path = os.path.join(supervisor_folder_path, supervisor_name_jpg)
 
-    district_folder_path = os.path.join(
-        os.getcwd(), "template", "照片", record.get("district"), "營業處"  # e.g. "西區"
-    )
+    # district_folder_path = os.path.join(
+    #     os.getcwd(), "template", "照片", record.get("district"), "營業處"  # e.g. "西區"
+    # )
 
-    # 取得資料夾內所有 .jpg 檔案
-    district_image_files = [
-        f for f in os.listdir(district_folder_path) if f.lower().endswith(".jpg")
-    ]
+    # # 取得資料夾內所有 .jpg 檔案
+    # district_image_files = [
+    #     f for f in os.listdir(district_folder_path) if f.lower().endswith(".jpg")
+    # ]
 
-    # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
-    if not district_image_files:
-        print("此資料夾沒有任何 JPG 檔案:", district_folder_path)
-        return None, None
+    # # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
+    # if not district_image_files:
+    #     print("此資料夾沒有任何 JPG 檔案:", district_folder_path)
+    #     return None, None
 
-    # 從最後兩個檔案中隨機選一個
-    random_jpg = random.choice(district_image_files)
+    # # 從最後兩個檔案中隨機選一個
+    # random_jpg = random.choice(district_image_files)
 
-    # 組合成完整路徑
-    district_path = os.path.join(district_folder_path, random_jpg)
+    # # 組合成完整路徑
+    # district_path = os.path.join(district_folder_path, random_jpg)
     # 插入到模板中，假設模板裡有 {{ supervisor_name_pic }} 的占位符
     # record["supervisor_name_pic"] = InlineImage(
     #     doc, supervisor_name_jpg_path, width=Cm(6)
@@ -363,41 +363,41 @@ def generate_data_doc(
         row_cells[4].text = str(row_data.get("Ground_Elevation", ""))
         row_cells[5].text = str(row_data.get("Pipe_Burial_Depth", ""))
         row_cells[6].text = str(row_data.get("Pipe_Top_Coordinate_Z", ""))
+    if reserved_data:
+        headers = [
+            "編號",
+            "種類",
+            "座標X",
+            "座標Y",
+            "地盤高程",
+            "座標z",
+            "",
+        ]
+        # 在 simulated_data 資料列後插入另一個 header 行 (reserved_data 的 header)
+        header_cells = table.add_row().cells
+        for j, cell in enumerate(header_cells):
+            paragraph = cell.paragraphs[0]
+            paragraph.clear()  # 清除預設內容以確保格式一致
+            run = paragraph.add_run(headers[j])
+            run.font.name = "標楷體"
+            run._element.rPr.rFonts.set(qn("w:eastAsia"), "標楷體")
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+        header_row2 = table.rows[-1]
+        header_row2.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
 
-    headers = [
-        "編號",
-        "種類",
-        "座標X",
-        "座標Y",
-        "地盤高程",
-        "座標z",
-        "",
-    ]
-    # 在 simulated_data 資料列後插入另一個 header 行 (reserved_data 的 header)
-    header_cells = table.add_row().cells
-    for j, cell in enumerate(header_cells):
-        paragraph = cell.paragraphs[0]
-        paragraph.clear()  # 清除預設內容以確保格式一致
-        run = paragraph.add_run(headers[j])
-        run.font.name = "標楷體"
-        run._element.rPr.rFonts.set(qn("w:eastAsia"), "標楷體")
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
-    header_row2 = table.rows[-1]
-    header_row2.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
-
-    # 插入 reserved_data 資料列，並移除第6欄資料（埋管深度），將管頂座標z左移
-    for row_data in reserved_data:
-        row_cells = table.add_row().cells
-        row_cells[0].text = str(row_data.get("Number", ""))
-        row_cells[1].text = str(row_data.get("Type", ""))
-        row_cells[2].text = str(row_data.get("Coordinate_X", ""))
-        row_cells[3].text = str(row_data.get("Coordinate_Y", ""))
-        row_cells[4].text = str(row_data.get("Ground_Elevation", ""))
-        # 將原來應該放在第7欄的「管頂座標z」左移至第6欄
-        row_cells[5].text = str(row_data.get("Pipe_Top_Coordinate_Z", ""))
-        # 第7欄清空
-        row_cells[6].text = ""
+        # 插入 reserved_data 資料列，並移除第6欄資料（埋管深度），將管頂座標z左移
+        for row_data in reserved_data:
+            row_cells = table.add_row().cells
+            row_cells[0].text = str(row_data.get("Number", ""))
+            row_cells[1].text = str(row_data.get("Type", ""))
+            row_cells[2].text = str(row_data.get("Coordinate_X", ""))
+            row_cells[3].text = str(row_data.get("Coordinate_Y", ""))
+            row_cells[4].text = str(row_data.get("Ground_Elevation", ""))
+            # 將原來應該放在第7欄的「管頂座標z」左移至第6欄
+            row_cells[5].text = str(row_data.get("Pipe_Top_Coordinate_Z", ""))
+            # 第7欄清空
+            row_cells[6].text = ""
 
     # 設定表格屬性（寬度、邊框等）
     tbl = table._element
