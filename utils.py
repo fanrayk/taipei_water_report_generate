@@ -63,20 +63,20 @@ def overlay_images_to_pdf(original_pdf_path,output_pdf_path):
 
     # 選取第一張圖片
     image_path1 = filedialog.askopenfilename(
-        title="請選取第一張圖片",
+        title="請選取監工圖片",
         filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")]
     )
     if not image_path1:
-        print("未選取第一張圖片，結束。")
+        print("未選取監工圖片，結束。")
         return
 
     # 選取第二張圖片
     image_path2 = filedialog.askopenfilename(
-        title="請選取第二張圖片",
+        title="請選取營業處圖片",
         filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif")]
     )
     if not image_path2:
-        print("未選取第二張圖片，結束。")
+        print("未選取營業處圖片，結束。")
         return
 
     # --- 步驟 1：利用 ReportLab 生成 overlay PDF (存放在記憶體中) ---
@@ -105,7 +105,7 @@ def overlay_images_to_pdf(original_pdf_path,output_pdf_path):
     c.restoreState()
 
     # 第二張圖片的設定（可依需求調整）
-    ratio2 = 0.7
+    ratio2 = 0.75
     img_width2 = 277 * ratio2
     img_height2 = 181 * ratio2
     angle2 = random.uniform(-3,3)  # 旋轉角度（度）
