@@ -1,6 +1,5 @@
 # main.py
 import os
-import random
 from excel_processor import (
     select_folder_and_excel,
     process_excel_pandas,
@@ -14,13 +13,11 @@ from doc_generator import (
     merge_pdf_files,
     generate_image_doc,
     generate_data_doc,
-    merge_docs,
     merge_pdfs,
 )
 from photo_processor import photo_grouping_measured, photo_grouping_app
 from utils import cleanup_temp_files, overlay_images_to_pdf
 from docx2pdf import convert
-from tkinter import filedialog
 
 
 def main():
@@ -61,18 +58,6 @@ def main():
     merged_pdf_filename = os.path.join(
         output_folder, f"temp_{context_number}-附件1-證明資料.pdf"
     )
-    # if reserved_data:
-    #     merge_docs(
-    #         [records_doc, reserved_doc, pipeline_doc],
-    #         output_folder,
-    #         f"{context_number}-附件1-證明資料.docx",
-    #     )
-    # else:
-    #     merge_docs(
-    #         [records_doc, pipeline_doc],
-    #         output_folder,
-    #         f"{context_number}-附件1-證明資料.docx",
-    #     )
 
     merge_pdf_files(pdf_list, merged_pdf_filename)
 
@@ -80,53 +65,6 @@ def main():
         os.path.join(output_folder, f"temp_{context_number}-附件1-證明資料.pdf"),
         os.path.join(output_folder, f"{context_number}-附件1-證明資料.pdf"),
     )
-
-    # import fitz  # pip install pymupdf
-
-    # # 打開既有的 PDF 文件
-    # doc = fitz.open(merged_pdf_filename)
-
-    # # 選擇要插入圖片的頁面（例如第一頁，索引為0）
-    # page = doc[0]
-    # x_start = 90+random.randint(-10, 10)
-    # y_start = 700+random.randint(-10, 10)
-
-    # ratio = 0.6
-    # ratio1 = 0.6
-
-    # x1_start = 320+random.randint(-10, 10)
-    # y1_start = 680+random.randint(-10, 10)
-    # # 定義圖片插入的位置和大小：這裡定義了一個矩形區域
-    # # 格式為 fitz.Rect(x0, y0, x1, y1)，單位通常是點（1/72 英寸）
-    # rect = fitz.Rect(x_start, y_start, x_start + (180 * ratio), y_start + (57 * ratio))
-    # rect1 = fitz.Rect(
-    #     x1_start, y1_start, x1_start + (272 * ratio1), y1_start + (181 * ratio1)
-    # )
-
-    # # 選擇第一張圖片
-    # image1_path = filedialog.askopenfilename(
-    #     title="選擇第一張圖片（個人照片）",
-    #     filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp")],
-    # )
-    # if not image1_path:
-    #     print("未選擇第一張圖片，程式結束。")
-    #     return
-
-    # # 選擇第二張圖片
-    # image2_path = filedialog.askopenfilename(
-    #     title="選擇第二張圖片（區處章）",
-    #     filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp")],
-    # )
-    # if not image2_path:
-    #     print("未選擇第二張圖片，程式結束。")
-    #     return
-    # # 在指定區域插入圖片
-    # page.insert_image(rect, filename=image1_path)
-    # page.insert_image(rect1, filename=image2_path)
-
-    # # 保存修改後的 PDF 到一個新文件
-    # doc.save(os.path.join(output_folder, f"{context_number}-附件1-證明資料.pdf"))
-    # doc.close()
 
     # 7. 照片分組處理
     print("========== 現在開始『測量照』照片分組處理 ==========")

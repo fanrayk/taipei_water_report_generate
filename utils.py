@@ -1,15 +1,15 @@
 # utils.py
 import os
-import re
 import random
 import glob
-import tkinter as tk
-from tkinter import filedialog
 import pandas as pd
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from PIL import Image
 import io
+from tkinter import Tk, filedialog
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from PyPDF2 import PdfReader, PdfWriter
 
 def transform_measurement_method(x):
     """將施測方式或儀器代號轉換成 4 位數字字串，再拆分成四個部分"""
@@ -50,20 +50,6 @@ def cleanup_temp_files(output_folder, pattern="temp*"):
         except Exception as e:
             print(f"刪除暫存檔案 {temp_file} 時發生錯誤: {e}")
 
-# def rotate_image(image_path, angle):
-#     """打開圖片、旋轉指定角度，並返回位元流"""
-#     img = Image.open(image_path)
-#     rotated_img = img.rotate(angle, expand=True)  # expand=True 使圖片大小根據旋轉調整
-#     img_byte_arr = io.BytesIO()
-#     rotated_img.save(img_byte_arr, format='PNG')
-#     return img_byte_arr.getvalue()
-
-import io
-import math
-from tkinter import Tk, filedialog
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from PyPDF2 import PdfReader, PdfWriter
 
 def overlay_images_to_pdf(original_pdf_path,output_pdf_path):
     """
@@ -96,10 +82,9 @@ def overlay_images_to_pdf(original_pdf_path,output_pdf_path):
     # --- 步驟 1：利用 ReportLab 生成 overlay PDF (存放在記憶體中) ---
     packet = io.BytesIO()  # 記憶體暫存區
     c = canvas.Canvas(packet, pagesize=A4)
-    page_width, page_height = A4
 
     # 第一張圖片的設定（可依需求調整）
-    ratio1 = 1
+    ratio1 = 0.7
     img_width1 = 177 * ratio1  # 圖片寬度
     img_height1 = 52 * ratio1  # 圖片高度
     angle1 = random.uniform(-3,3)  # 旋轉角度（度）
@@ -120,7 +105,7 @@ def overlay_images_to_pdf(original_pdf_path,output_pdf_path):
     c.restoreState()
 
     # 第二張圖片的設定（可依需求調整）
-    ratio2 = 1
+    ratio2 = 0.7
     img_width2 = 277 * ratio2
     img_height2 = 181 * ratio2
     angle2 = random.uniform(-3,3)  # 旋轉角度（度）
@@ -161,9 +146,3 @@ def overlay_images_to_pdf(original_pdf_path,output_pdf_path):
             output.write(f_out)
 
     print("PDF 合併完成！輸出檔案：", output_pdf_path)
-
-# # 使用範例
-# if __name__ == "__main__":
-#     # 設定輸出 PDF 的路徑
-#     output_pdf = "merged.pdf"
-#     overlay_images_to_pdf(output_pdf)

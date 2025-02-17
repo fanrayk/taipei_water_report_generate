@@ -1,7 +1,6 @@
 # doc_generator.py
 import os
-import random
-from docxtpl import DocxTemplate, InlineImage
+from docxtpl import DocxTemplate
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -10,65 +9,13 @@ from docx.shared import Pt, Cm
 from docx.enum.table import WD_ROW_HEIGHT_RULE, WD_CELL_VERTICAL_ALIGNMENT
 from docx2pdf import convert
 from PyPDF2 import PdfMerger
-from utils import set_cell_width, chunk_list
-
+from utils import set_cell_width
 
 def generate_records_doc(record, output_folder):
     template_path = os.path.join(
         "template", "附件1模板", "附件1_自主查核表_首頁模板.docx"
     )
     doc = DocxTemplate(template_path)
-
-    # # 根據 record["district"] 與 record["supervisor_name"] 找到對應資料夾
-    # supervisor_folder_path = os.path.join(
-    #     os.getcwd(),
-    #     "template",
-    #     "照片",
-    #     record.get("district"),  # e.g. "西區"
-    #     "監工",
-    #     record.get("supervisor_name"),  # e.g. "朱彥顯"
-    # )
-
-    # # 取得資料夾內所有 .jpg 檔案
-    # supervisor_image_files = [
-    #     f for f in os.listdir(supervisor_folder_path) if f.lower().endswith(".jpg")
-    # ]
-
-    # # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
-    # if not supervisor_image_files:
-    #     print("此資料夾沒有任何 JPG 檔案:", supervisor_folder_path)
-    #     return None, None
-
-    # # 從最後兩個檔案中隨機選一個
-    # supervisor_name_jpg = random.choice(supervisor_image_files)
-
-    # # 組合成完整路徑
-    # supervisor_name_jpg_path = os.path.join(supervisor_folder_path, supervisor_name_jpg)
-
-    # district_folder_path = os.path.join(
-    #     os.getcwd(), "template", "照片", record.get("district"), "營業處"  # e.g. "西區"
-    # )
-
-    # # 取得資料夾內所有 .jpg 檔案
-    # district_image_files = [
-    #     f for f in os.listdir(district_folder_path) if f.lower().endswith(".jpg")
-    # ]
-
-    # # 如果資料夾內沒有任何 .jpg，直接處理例外或結束
-    # if not district_image_files:
-    #     print("此資料夾沒有任何 JPG 檔案:", district_folder_path)
-    #     return None, None
-
-    # # 從最後兩個檔案中隨機選一個
-    # random_jpg = random.choice(district_image_files)
-
-    # # 組合成完整路徑
-    # district_path = os.path.join(district_folder_path, random_jpg)
-    # 插入到模板中，假設模板裡有 {{ supervisor_name_pic }} 的占位符
-    # record["supervisor_name_pic"] = InlineImage(
-    #     doc, supervisor_name_jpg_path, width=Cm(6)
-    # )
-    # record["district_pic"] = InlineImage(doc, district_path, width=Cm(6))
     doc.render(record)
     # 在檔名前加上 context_number
     docx_filename = os.path.join(output_folder, "temp_自主查核表首頁.docx")
@@ -275,8 +222,6 @@ def generate_image_doc(folder_path, context_number, output_folder):
         img_table = subdoc.add_table(rows=2, cols=1)
         
         # 直接設定表格寬度到最大（9020 dxa，大約 15.92 公分）
-        # from docx.oxml import OxmlElement
-        # from docx.oxml.ns import qn
         tbl = img_table._element
         tblPr = tbl.find(qn("w:tblPr"))
         if tblPr is None:

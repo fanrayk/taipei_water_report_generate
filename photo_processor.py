@@ -1,7 +1,6 @@
 # photo_processor.py
 import os
 from docxtpl import DocxTemplate, InlineImage
-from docx import Document
 from docx.shared import Cm
 from PyPDF2 import PdfMerger
 from docx2pdf import convert
