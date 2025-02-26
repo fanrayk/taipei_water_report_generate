@@ -37,7 +37,7 @@ def main():
 
     # 4. 利用 openpyxl 分離資料
     simulated_data, reserved_data = process_excel_openpyxl(
-        excel_file_path, survey_point_count
+        excel_file_path
     )
 
     # 5. 產生首頁文件

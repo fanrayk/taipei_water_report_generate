@@ -12,6 +12,7 @@ def select_folder_and_excel():
     並確認該資料夾內僅有一個 Excel 檔案。
     """
     root = tk.Tk()
+    root.attributes("-topmost", True)
     root.withdraw()
     folder_path = filedialog.askdirectory(title="選擇包含Excel檔案的資料夾")
     if not folder_path:
@@ -75,26 +76,34 @@ def process_excel_pandas(excel_file_path):
     df_renamed["survey_equipment"] = df_renamed["survey_equipment"].apply(transform_measurement_method)
     df_renamed = df_renamed.fillna("empty")
     return df_renamed
-
-def process_excel_openpyxl(excel_file_path, survey_point_count):
+def process_excel_openpyxl(excel_file_path):
     """
     使用 openpyxl 讀取 Excel 指定範圍資料，
     並根據 B 欄格式分離為 simulated_data 與 reserved_data。
+    此版本改以從第五行起檢查 A~G 欄有資料的列數作為 n_value。
     """
     import openpyxl, re
     wb = openpyxl.load_workbook(excel_file_path, data_only=True)
     ws = wb.active
-    try:
-        n_value = int(survey_point_count)
-    except ValueError:
-        print("survey_point_count 欄位的數值無法轉換為整數，程式結束。")
-        exit()
+
     start_row = 5
+    # 取得從第五行開始、A 至 G 欄的所有列
+    all_rows = list(ws.iter_rows(min_row=start_row, max_col=7))
+    # 過濾掉完全沒有資料的列
+    non_empty_rows = [row for row in all_rows if any(cell.value is not None for cell in row)]
+    n_value = len(non_empty_rows)
+    
+    if n_value == 0:
+        print("從第 5 行起在 A 至 G 列沒有發現任何資料。")
+        return [], []
+
     end_row = start_row + n_value - 1
     data_range = ws[f"A{start_row}:G{end_row}"]
+    
     pattern = re.compile(r"^\s*\d+管道點\d+-實測\s*$")
     simulated_data = []
     reserved_data = []
+    
     for row in data_range:
         b_value = row[1].value
         b_str = str(b_value) if b_value is not None else ""
@@ -102,11 +111,11 @@ def process_excel_openpyxl(excel_file_path, survey_point_count):
             reserved_data.append({
                 "Number": row[0].value,
                 "Type": row[1].value,
-                "Coordinate_X": round(row[2].value,3),
-                "Coordinate_Y": round(row[3].value,3),
-                "Ground_Elevation": round(row[4].value,3),
-                "Pipe_Burial_Depth": round(row[5].value,2),
-                "Pipe_Top_Coordinate_Z": round(row[4].value,3),
+                "Coordinate_X": round(row[2].value, 3),
+                "Coordinate_Y": round(row[3].value, 3),
+                "Ground_Elevation": round(row[4].value, 3),
+                "Pipe_Burial_Depth": round(row[5].value, 2),
+                "Pipe_Top_Coordinate_Z": round(row[4].value, 3),
             })
             continue
         simulated_data.append({
@@ -117,17 +126,13 @@ def process_excel_openpyxl(excel_file_path, survey_point_count):
             "Ground_Elevation": round(row[4].value, 3),
             "Pipe_Burial_Depth": round(row[5].value, 2),
             "Pipe_Top_Coordinate_Z": round(row[6].value, 3),
-        
-            # "Coordinate_X": round(row[2].value, 3) if isinstance(row[2].value, (int, float)) else row[2].value,
-            # "Coordinate_Y": round(row[3].value, 3) if isinstance(row[3].value, (int, float)) else row[3].value,
-            # "Ground_Elevation": round(row[4].value, 3) if isinstance(row[4].value, (int, float)) else row[4].value,
-            # "Pipe_Burial_Depth": round(row[5].value, 2) if isinstance(row[5].value, (int, float)) else row[5].value,
-            # "Pipe_Top_Coordinate_Z": round(row[6].value, 3) if isinstance(row[6].value, (int, float)) else row[6].value,
         })
+    
     if reserved_data:
         print("以下資料不符合格式，將保留起來，不加入主要表格：")
         for item in reserved_data:
             print(item)
+    
     return simulated_data, reserved_data
 
 def create_output_folder(case_number):
