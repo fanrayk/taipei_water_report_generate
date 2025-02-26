@@ -102,21 +102,27 @@ def process_excel_openpyxl(excel_file_path, survey_point_count):
             reserved_data.append({
                 "Number": row[0].value,
                 "Type": row[1].value,
-                "Coordinate_X": row[2].value,
-                "Coordinate_Y": row[3].value,
-                "Ground_Elevation": row[4].value,
-                "Pipe_Burial_Depth": row[5].value,
-                "Pipe_Top_Coordinate_Z": row[6].value,
+                "Coordinate_X": round(row[2].value,3),
+                "Coordinate_Y": round(row[3].value,3),
+                "Ground_Elevation": round(row[4].value,3),
+                "Pipe_Burial_Depth": round(row[5].value,2),
+                "Pipe_Top_Coordinate_Z": round(row[4].value,3),
             })
             continue
         simulated_data.append({
             "Number": row[0].value,
             "Type": row[1].value,
-            "Coordinate_X": round(row[2].value, 4) if isinstance(row[2].value, (int, float)) else row[2].value,
-            "Coordinate_Y": round(row[3].value, 4) if isinstance(row[3].value, (int, float)) else row[3].value,
-            "Ground_Elevation": round(row[4].value, 3) if isinstance(row[4].value, (int, float)) else row[4].value,
-            "Pipe_Burial_Depth": round(row[5].value, 2) if isinstance(row[5].value, (int, float)) else row[5].value,
-            "Pipe_Top_Coordinate_Z": round(row[6].value, 4) if isinstance(row[6].value, (int, float)) else row[6].value,
+            "Coordinate_X": round(row[2].value, 3),
+            "Coordinate_Y": round(row[3].value, 3),
+            "Ground_Elevation": round(row[4].value, 3),
+            "Pipe_Burial_Depth": round(row[5].value, 2),
+            "Pipe_Top_Coordinate_Z": round(row[6].value, 3),
+        
+            # "Coordinate_X": round(row[2].value, 3) if isinstance(row[2].value, (int, float)) else row[2].value,
+            # "Coordinate_Y": round(row[3].value, 3) if isinstance(row[3].value, (int, float)) else row[3].value,
+            # "Ground_Elevation": round(row[4].value, 3) if isinstance(row[4].value, (int, float)) else row[4].value,
+            # "Pipe_Burial_Depth": round(row[5].value, 2) if isinstance(row[5].value, (int, float)) else row[5].value,
+            # "Pipe_Top_Coordinate_Z": round(row[6].value, 3) if isinstance(row[6].value, (int, float)) else row[6].value,
         })
     if reserved_data:
         print("以下資料不符合格式，將保留起來，不加入主要表格：")
