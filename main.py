@@ -29,6 +29,7 @@ def main():
     if df_renamed.empty:
         print("Excel 資料讀取失敗，程式結束。")
         exit()
+    district = df_renamed["district"].iloc[0]
     context_number = df_renamed["case_number"].iloc[0]
     survey_point_count = df_renamed["survey_point_count"].iloc[0]
 
@@ -36,9 +37,7 @@ def main():
     output_folder = create_output_folder(context_number)
 
     # 4. 利用 openpyxl 分離資料
-    simulated_data, reserved_data = process_excel_openpyxl(
-        excel_file_path
-    )
+    simulated_data, reserved_data = process_excel_openpyxl(excel_file_path)
 
     # 5. 產生首頁文件
     records_list = df_renamed.to_dict(orient="records")
@@ -47,12 +46,12 @@ def main():
 
     # 6. 產生管線文件及（如有）設施物文件
     pipeline_doc, pipeline_pdf = generate_pipeline_doc(
-        simulated_data, context_number, output_folder
+        simulated_data, context_number, district, output_folder
     )
     pdf_list = [records_pdf, pipeline_pdf]
     if reserved_data:
         reserved_doc, reserved_pdf = generate_reserved_doc(
-            reserved_data, context_number, output_folder
+            reserved_data, context_number, district, output_folder
         )
         pdf_list.append(reserved_pdf)
     merged_pdf_filename = os.path.join(

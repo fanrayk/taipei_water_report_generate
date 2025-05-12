@@ -11,6 +11,7 @@ from docx2pdf import convert
 from PyPDF2 import PdfMerger
 from utils import set_cell_width
 
+
 def generate_records_doc(record, output_folder):
     template_path = os.path.join(
         "template", "附件1模板", "附件1_自主查核表_首頁模板.docx"
@@ -26,7 +27,7 @@ def generate_records_doc(record, output_folder):
     return docx_filename, pdf_path
 
 
-def generate_pipeline_doc(simulated_data, context_number, output_folder):
+def generate_pipeline_doc(simulated_data, context_number, district, output_folder):
     template_path = os.path.join(
         "template", "附件1模板", "附件1_定位資料回饋表_管道模板.docx"
     )
@@ -87,7 +88,7 @@ def generate_pipeline_doc(simulated_data, context_number, output_folder):
         border.set(qn("w:color"), "000000")
         tbl_borders.append(border)
     tblPr.append(tbl_borders)
-    context = {"table": subdoc, "case_number": context_number}
+    context = {"table": subdoc, "case_number": context_number, "district": district}
     doc.render(context)
     word_filename = os.path.join(output_folder, "temp_管線.docx")
     doc.save(word_filename)
@@ -97,7 +98,7 @@ def generate_pipeline_doc(simulated_data, context_number, output_folder):
     return word_filename, pdf_filename
 
 
-def generate_reserved_doc(reserved_data, context_number, output_folder):
+def generate_reserved_doc(reserved_data, context_number, district, output_folder):
     template_path = os.path.join(
         "template", "附件1模板", "附件1_定位資料回饋表_設施物模板.docx"
     )
@@ -164,7 +165,7 @@ def generate_reserved_doc(reserved_data, context_number, output_folder):
         border.set(qn("w:color"), "000000")
         tbl_borders.append(border)
     tblPr.append(tbl_borders)
-    context = {"table": subdoc, "cast_number": context_number}
+    context = {"table": subdoc, "cast_number": context_number, "district": district}
     doc.render(context)
     docx_filename = os.path.join(output_folder, "temp_設施物.docx")
     doc.save(docx_filename)
@@ -181,6 +182,7 @@ def merge_pdf_files(pdf_files, merged_pdf_filename):
     merger.write(merged_pdf_filename)
     merger.close()
     print("PDF 合併完成，最終 PDF 檔案：", merged_pdf_filename)
+
 
 def generate_image_doc(folder_path, context_number, output_folder):
     template_path = os.path.join("template", "附件4模板", "附件4模板.docx")
@@ -210,17 +212,17 @@ def generate_image_doc(folder_path, context_number, output_folder):
     image_files.sort(key=extract_number)
     image_groups = [image_files[i : i + 2] for i in range(0, len(image_files), 2)]
     print(f"【平面圖】共找到 {len(image_files)} 張照片，分成 {len(image_groups)} 組。")
-    
+
     if not os.path.exists(template_path):
         print(f"找不到模板檔案：{template_path}")
         return None
-    
+
     temp_pages = []
     for idx, group in enumerate(image_groups, start=1):
         doc = DocxTemplate(template_path)
         subdoc = doc.new_subdoc()
         img_table = subdoc.add_table(rows=2, cols=1)
-        
+
         # 直接設定表格寬度到最大（9020 dxa，大約 15.92 公分）
         tbl = img_table._element
         tblPr = tbl.find(qn("w:tblPr"))
@@ -231,14 +233,14 @@ def generate_image_doc(folder_path, context_number, output_folder):
         tblWidth.set(qn("w:w"), "9020")
         tblWidth.set(qn("w:type"), "dxa")
         tblPr.append(tblWidth)
-        
+
         for i in range(2):
             cell = img_table.cell(i, 0)
             paragraph = cell.paragraphs[0]
             paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
             if i < len(group):
                 run = paragraph.add_run()
-                run.add_picture(group[i],  height=Cm(7.65))  # 7.65 cm是我自己抓的數字
+                run.add_picture(group[i], height=Cm(7.65))  # 7.65 cm是我自己抓的數字
             else:
                 paragraph.add_run("")
         context = {"case_number": context_number, "table": subdoc}
@@ -248,13 +250,13 @@ def generate_image_doc(folder_path, context_number, output_folder):
         temp_page = os.path.join(output_folder, f"temp_image_page_{idx}.docx")
         doc.save(temp_page)
         temp_pages.append(temp_page)
-        
+
     merged_doc = Document(temp_pages[0])
     for temp_file in temp_pages[1:]:
         temp_doc = Document(temp_file)
         for element in temp_doc.element.body:
             merged_doc.element.body.append(element)
-            
+
     image_docx_path = os.path.join(output_folder, "temp_平面圖_圖片.docx")
     merged_doc.save(image_docx_path)
     print("【平面圖 - 圖片部分】已儲存:", image_docx_path)
