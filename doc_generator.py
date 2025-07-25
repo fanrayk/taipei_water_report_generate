@@ -165,7 +165,7 @@ def generate_reserved_doc(reserved_data, context_number, district, output_folder
         border.set(qn("w:color"), "000000")
         tbl_borders.append(border)
     tblPr.append(tbl_borders)
-    context = {"table": subdoc, "cast_number": context_number, "district": district}
+    context = {"table": subdoc, "case_number": context_number, "district": district}
     doc.render(context)
     docx_filename = os.path.join(output_folder, "temp_設施物.docx")
     doc.save(docx_filename)
