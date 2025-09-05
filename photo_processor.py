@@ -98,7 +98,7 @@ def photo_grouping_app(folder_path, context_number, output_folder):
             photo_key = f"image_{i+1}"
             point_key = f"point_{i+1}"
             if i < len(group):
-                context[photo_key] = InlineImage(doc, group[i], width=Cm(8.09), height=Cm(5))
+                context[photo_key] = InlineImage(doc, group[i], width=Cm(5/1690*1440), height=Cm(5))
                 context[point_key] = f"編號：pt{os.path.splitext(os.path.basename(group[i]))[0].replace('app_pt', '')}"
             else:
                 context[photo_key] = ""
