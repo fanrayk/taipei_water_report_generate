@@ -10,7 +10,8 @@ from docx.enum.table import WD_ROW_HEIGHT_RULE, WD_CELL_VERTICAL_ALIGNMENT
 from docx2pdf import convert
 from PyPDF2 import PdfMerger
 from utils import set_cell_width
-
+import time
+from docxcompose.composer import Composer
 
 def generate_records_doc(record, output_folder):
     template_path = os.path.join(
@@ -251,15 +252,17 @@ def generate_image_doc(folder_path, context_number, output_folder):
         doc.save(temp_page)
         temp_pages.append(temp_page)
 
+    # 使用 Composer 來正確合併所有 temp_pages
     merged_doc = Document(temp_pages[0])
+    composer = Composer(merged_doc)
     for temp_file in temp_pages[1:]:
-        temp_doc = Document(temp_file)
-        for element in temp_doc.element.body:
-            merged_doc.element.body.append(element)
+        print(temp_file)
+        composer.append(Document(temp_file))
 
-    image_docx_path = os.path.join(output_folder, "temp_平面圖_圖片.docx")
-    merged_doc.save(image_docx_path)
-    print("【平面圖 - 圖片部分】已儲存:", image_docx_path)
+    image_docx_path = os.path.join(output_folder, f"temp_平面圖_圖片.docx")
+    composer.save(image_docx_path)
+
+    print(f"【平面圖 - 圖片部分】已儲存: {image_docx_path}")
     return image_docx_path
 
 
